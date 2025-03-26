@@ -43,7 +43,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// Use the factory to create an adapter for the primary graphics interface (video card).
-	result = factory->EnumAdapters(0, &adapter);
+	result = factory->EnumAdapters(1, &adapter);
 	if (FAILED(result))
 	{
 		return false;
