@@ -3,8 +3,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "inputclass.h"
 #include "applicationclass.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 class SystemClass
 {
@@ -26,10 +27,11 @@ private:
 
 private:
 	LPCWSTR m_applicationName;
-	HINSTANCE m_hinstance;
+	HINSTANCE m_hInstance;
 	HWND m_hwnd;
 
-	InputClass* m_Input;
+	Keyboard m_Keyboard;
+	Mouse m_Mouse;
 	ApplicationClass* m_Application;
 };
 

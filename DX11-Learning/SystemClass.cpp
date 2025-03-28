@@ -2,7 +2,6 @@
 
 SystemClass::SystemClass()
 {
-	m_Input = nullptr;
 	m_Application = nullptr;
 }
 
@@ -23,11 +22,6 @@ bool SystemClass::Initialize()
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
-	// Create and initialize the input object.  This object will be used to handle reading the keyboard input from the user.
-	m_Input = new InputClass;
-
-	m_Input->Initialize();
-
 	// Create and initialize the application class object.  This object will handle rendering all the graphics for this application.
 	m_Application = new ApplicationClass;
 
@@ -46,8 +40,7 @@ bool SystemClass::Frame()
 
 
 	// Check if the user pressed escape and wants to exit the application.
-	if (m_Input->IsKeyDown(VK_ESCAPE))
-	{
+	if (m_Keyboard.KeyIsPressed(VK_ESCAPE)) {
 		return false;
 	}
 
@@ -112,7 +105,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	ApplicationHandle = this;
 
 	// Get the instance of this application.
-	m_hinstance = GetModuleHandle(NULL);
+	m_hInstance = GetModuleHandle(nullptr);
 
 	// Give the application a name.
 	m_applicationName = L"Engine";
@@ -122,14 +115,14 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = m_hinstance;
+	wc.hInstance = m_hInstance;
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hIconSm = wc.hIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = m_applicationName;
-	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.cbSize = sizeof(wc);
 
 	// Register the window class.
 	RegisterClassEx(&wc);
@@ -168,8 +161,8 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 
 	// Create the window with the screen settings and get the handle to it.
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_applicationName, m_applicationName,
-		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
-		posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
+		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+		posX, posY, screenWidth, screenHeight, NULL, NULL, m_hInstance, NULL);
 
 	// Bring the window up on the screen and set it as main focus.
 	ShowWindow(m_hwnd, SW_SHOW);
@@ -177,7 +170,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	SetFocus(m_hwnd);
 
 	// Hide the mouse cursor.
-	ShowCursor(false);
+	ShowCursor(true);
 
 	return;
 }
@@ -190,13 +183,6 @@ void SystemClass::Shutdown()
 		m_Application->Shutdown();
 		delete m_Application;
 		m_Application = 0;
-	}
-
-	// Release the input object.
-	if (m_Input)
-	{
-		delete m_Input;
-		m_Input = 0;
 	}
 
 	// Shutdown the window.
@@ -221,8 +207,8 @@ void SystemClass::ShutdownWindows()
 	m_hwnd = NULL;
 
 	// Remove the application instance.
-	UnregisterClass(m_applicationName, m_hinstance);
-	m_hinstance = NULL;
+	UnregisterClass(m_applicationName, m_hInstance);
+	m_hInstance = NULL;
 
 	// Release the pointer to this class.
 	ApplicationHandle = NULL;
@@ -230,26 +216,61 @@ void SystemClass::ShutdownWindows()
 	return;
 }
 
-LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam) 
 {
 	switch (umsg)
 	{
-		// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:
-	{
-		// If a key is pressed send it to the input object so it can record that state.
-		m_Input->KeyDown((unsigned int)wparam);
-		return 0;
-	}
-
-	// Check if a key has been released on the keyboard.
+		m_Keyboard.OnKeyPressed(static_cast<unsigned char>(wparam));
+		break;
 	case WM_KEYUP:
+		m_Keyboard.OnKeyReleased(static_cast<unsigned char>(wparam));
+		break;
+	case WM_CHAR:
+		m_Keyboard.OnChar(static_cast<unsigned char>(wparam));
+		break;
+	case WM_MOUSEMOVE:
 	{
-		// If a key is released then send it to the input object so it can unset the state for that key.
-		m_Input->KeyUp((unsigned int)wparam);
-		return 0;
+		POINTS pt = MAKEPOINTS(lparam);
+		m_Mouse.OnMouseMove(pt.x, pt.y);
 	}
-
+	case WM_LBUTTONDOWN:
+	{
+		const POINTS pt = MAKEPOINTS(lparam);
+		m_Mouse.OnLeftPressed(pt.x, pt.y);
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		const POINTS pt = MAKEPOINTS(lparam);
+		m_Mouse.OnRightPressed(pt.x, pt.y);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lparam);
+		m_Mouse.OnLeftReleased(pt.x, pt.y);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lparam);
+		m_Mouse.OnRightReleased(pt.x, pt.y);
+		break;
+	}
+	case WM_MOUSEWHEEL:
+	{
+		const POINTS pt = MAKEPOINTS(lparam);
+		if (GET_WHEEL_DELTA_WPARAM(wparam) > 0)
+		{
+			m_Mouse.OnWheelUp(pt.x, pt.y);
+		}
+		else if (GET_WHEEL_DELTA_WPARAM(wparam) < 0)
+		{
+			m_Mouse.OnWheelDown(pt.x, pt.y);
+		}
+		break;
+	}
 	// Any other messages send to the default message handler as our application won't make use of them.
 	default:
 	{

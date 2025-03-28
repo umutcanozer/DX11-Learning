@@ -143,8 +143,9 @@
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="D3DClass.h" />
-    <ClInclude Include="InputClass.h" />
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="ModelClass.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="SystemClass.h" />
   </ItemGroup>
   <ItemGroup>
@@ -159,9 +160,10 @@
     <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="D3DClass.cpp" />
-    <ClCompile Include="InputClass.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelClass.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="SystemClass.cpp" />
   </ItemGroup>
   <ItemGroup>
