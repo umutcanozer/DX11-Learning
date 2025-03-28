@@ -1,5 +1,4 @@
-#ifndef _D3DCLASS_H_
-#define _D3DCLASS_H_
+#pragma once
 
 #include <d3d11.h>
 #include <directxmath.h>
@@ -47,5 +46,5 @@ private:
     D3D11_VIEWPORT m_viewport;
 };
 
-#endif
+
 

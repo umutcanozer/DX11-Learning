@@ -1,5 +1,4 @@
-#ifndef _CAMERACLASS_H_
-#define _CAMERACLASS_H_
+#pragma once
 
 #include <directxmath.h>
 
@@ -25,5 +24,5 @@ private:
 	DirectX::XMMATRIX m_viewMatrix;
 };
 
-#endif
+
 

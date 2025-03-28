@@ -1,5 +1,4 @@
-#ifndef _APPLICATIONCLASS_H_
-#define _APPLICATIONCLASS_H_
+#pragma once
 
 #include "D3DClass.h"
 #include "cameraclass.h"
@@ -33,4 +32,3 @@ private:
 	ColorShaderClass* m_ColorShader;
 };
 
-#endif
