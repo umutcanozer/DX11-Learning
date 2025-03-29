@@ -1,6 +1,7 @@
 #pragma once
 
 #include "D3DClass.h"
+#include "SystemClass.h"
 #include "cameraclass.h"
 #include "modelclass.h"
 #include "colorshaderclass.h"
@@ -15,11 +16,14 @@ class ApplicationClass
 {
 public:
 	ApplicationClass();
-	ApplicationClass(const ApplicationClass&);
+	ApplicationClass(const ApplicationClass&) = delete;
+	ApplicationClass& operator=(const ApplicationClass&) = delete;
 	~ApplicationClass();
-
-	bool Initialize(int, int, HWND);
+	
+	bool Initialize(int, int);
+	int Go();
 	void Shutdown();
+private:
 	bool Frame();
 
 private:
@@ -30,5 +34,6 @@ private:
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
+	SystemClass* m_System;
 };
 

@@ -2,38 +2,46 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "applicationclass.h"
+#include <optional>
 #include "Keyboard.h"
 #include "Mouse.h"
 
 class SystemClass
 {
+private:
+	class WindowClass
+	{
+	public:
+		static HINSTANCE GetInstance();
+		static const char* GetName();
+	private:
+		WindowClass();
+		~WindowClass();
+		WindowClass(const WindowClass&) = delete;
+		WindowClass& operator=(const WindowClass&) = delete;
+		static constexpr const char* wndClassName = "Engine";
+		static WindowClass wndClass;
+		HINSTANCE h_inst;
+
+	private:
+		LPCWSTR m_applicationName;
+	};
 public:
-	SystemClass();
-	SystemClass(const SystemClass&);
+	SystemClass(int screenWidth, int screenHeight, const char* name);
+	SystemClass(const SystemClass&) = delete;
+	SystemClass& operator=(const SystemClass&) = delete;
 	~SystemClass();
 
-	bool Initialize();
-	void Shutdown();
-	void Run();
+	HWND GetHWND();
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
-
+	static std::optional<int> ProcessMessages();
+	static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+public:
+	Keyboard kbd;
+	Mouse mouse;
 private:
-	bool Frame();
-	void InitializeWindows(int&, int&);
-	void ShutdownWindows();
-
-private:
-	LPCWSTR m_applicationName;
-	HINSTANCE m_hInstance;
-	HWND m_hwnd;
-
-	Keyboard m_Keyboard;
-	Mouse m_Mouse;
-	ApplicationClass* m_Application;
+	HWND m_hWnd;
+	int width;
+	int height;
 };
-
-static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-static SystemClass* ApplicationHandle = nullptr;
-

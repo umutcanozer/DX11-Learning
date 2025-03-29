@@ -6,25 +6,23 @@ ApplicationClass::ApplicationClass()
 	m_Camera = nullptr;
 	m_Model = nullptr;
 	m_ColorShader = nullptr;
+	m_System = nullptr;
 }
 
 
-ApplicationClass::ApplicationClass(const ApplicationClass& other)
-{
-}
-
-bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
+bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
 {
 	bool result;
 
-
+	m_System = new SystemClass(screenWidth, screenHeight, "Engine");
+	HWND hwnd = m_System->GetHWND();
 	// Create and initialize the Direct3D object.
 	m_Direct3D = new D3DClass;
 
 	result = m_Direct3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize Direct3D", L"Error", MB_OK);
+		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK);
 		return false;
 	}
 
@@ -40,7 +38,7 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	result = m_Model->Initialize(m_Direct3D->GetDevice());
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		MessageBox(hwnd, "Could not initialize the model object.", "Error", MB_OK);
 		return false;
 	}
 
@@ -50,7 +48,7 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
+		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 		return false;
 	}
 
@@ -89,6 +87,11 @@ void ApplicationClass::Shutdown()
 		m_Direct3D->Shutdown();
 		delete m_Direct3D;
 		m_Direct3D = nullptr;
+	}
+
+	if (m_System) {
+		delete m_System;
+		m_System = nullptr;
 	}
 
 	return;
@@ -143,6 +146,22 @@ bool ApplicationClass::Render()
 
 	return true;
 }
+
+
+int ApplicationClass::Go()
+{
+	while (true)
+	{
+		// process all messages pending, but to not block for new messages
+		if (const auto ecode = SystemClass::ProcessMessages())
+		{
+			// if return optional has value, means we're quitting so return exit code
+			return *ecode;
+		}
+		Frame();
+	}
+}
+
 
 ApplicationClass::~ApplicationClass()
 {
