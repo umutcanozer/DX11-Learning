@@ -3,8 +3,6 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	ApplicationClass* app;
-	bool result;
-
 
 	// Create the system object.
 	app = new ApplicationClass();

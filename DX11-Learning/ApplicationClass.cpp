@@ -12,65 +12,15 @@ ApplicationClass::ApplicationClass()
 
 bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
 {
-	bool result;
-
 	m_System = new SystemClass(screenWidth, screenHeight, "Engine");
-	HWND hwnd = m_System->GetHWND();
-	/*
-	// Create and initialize the Direct3D object.
-	m_Direct3D = new D3DClass;
-
-	result = m_Direct3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if (!result)
-	{
-		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK);
-		return false;
-	}
-
-	// Create the camera object.
-	m_Camera = new CameraClass;
-
-	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
-
-	// Create and initialize the model object.
-	m_Model = new ModelClass;
-
-	result = m_Model->Initialize(m_Direct3D->GetDevice());
-	if (!result)
-	{
-		MessageBox(hwnd, "Could not initialize the model object.", "Error", MB_OK);
-		return false;
-	}
-
-	// Create and initialize the color shader object.
-	m_ColorShader = new ColorShaderClass;
-
-	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
-		return false;
-	}*/
-
 	return true;
 }
 
 void ApplicationClass::Frame()
 {
 	m_System->GFX().ClearBuffer(1.f, 0.f, 0.f);
+	m_System->GFX().DrawingTriangle();
 	m_System->GFX().EndFrame();
-	/*bool result;
-
-
-	// Render the graphics scene.
-	result = Render();
-	if (!result)
-	{
-		return false;
-	}
-
-	return true;*/
 }
 
 

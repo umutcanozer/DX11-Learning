@@ -95,6 +95,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 				mouse.OnMouseEnter();
 			}
 		}
+		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
