@@ -3,8 +3,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <optional>
+#include <memory>
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics.h"
 
 class SystemClass
 {
@@ -25,6 +27,7 @@ private:
 
 	private:
 		LPCWSTR m_applicationName;
+		int x = 10;
 	};
 public:
 	SystemClass(int screenWidth, int screenHeight, const char* name);
@@ -33,9 +36,10 @@ public:
 	~SystemClass();
 
 	HWND GetHWND();
+	Graphics& GFX();
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
-	static std::optional<int> ProcessMessages();
+	std::optional<int> ProcessMessages();
 	static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 public:
 	Keyboard kbd;
@@ -44,4 +48,5 @@ private:
 	HWND m_hWnd;
 	int width;
 	int height;
+	std::unique_ptr<Graphics> p_Gfx;
 };

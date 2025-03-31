@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include <iostream>
 
 Graphics::Graphics(HWND hwnd)
 {
@@ -20,13 +21,13 @@ Graphics::Graphics(HWND hwnd)
 	scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	scd.Flags = 0;
 
-	D3D11CreateDeviceAndSwapChain(
+	hr = D3D11CreateDeviceAndSwapChain(
 		nullptr, //default
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		0,
 		&feature_level,
-		0,
+		1,
 		D3D11_SDK_VERSION,
 		&scd,
 		&m_swapChain,
@@ -34,7 +35,34 @@ Graphics::Graphics(HWND hwnd)
 		nullptr,
 		&m_deviceContext
 	);
+
+	if (FAILED(hr)) {
+		// Hata kodunu yazdýr veya logla
+		std::cerr << "D3D11CreateDeviceAndSwapChain failed with error: " << hr << std::endl;
+		return;
+	}
+
+	ID3D11Resource* p_backBuffer = nullptr;
+	//0 = backbuffer
+	m_swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&p_backBuffer));
+
+	hr = m_device->CreateRenderTargetView(p_backBuffer, nullptr, &m_renderTargetView);
+	if (FAILED(hr))
+	{
+		std::cerr << "CreateRenderTargetView failed with error: " << hr << std::endl;
+		return;
+	}
+	//it was needed temporary to create view
+	p_backBuffer->Release();
 }
+
+void Graphics::EndFrame()
+{
+	//Present the back buffer to the screen since rendering is complete.
+	//back buffer -> front buffer
+	m_swapChain->Present(1u, 0u);
+}
+
 
 Graphics::~Graphics()
 {
@@ -55,4 +83,10 @@ Graphics::~Graphics()
 		m_swapChain->Release();
 		m_swapChain = nullptr;
 	}
+
+	if (m_renderTargetView) {
+		m_renderTargetView->Release();
+		m_renderTargetView = nullptr;
+	}
 }
+

@@ -16,6 +16,7 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
 
 	m_System = new SystemClass(screenWidth, screenHeight, "Engine");
 	HWND hwnd = m_System->GetHWND();
+	/*
 	// Create and initialize the Direct3D object.
 	m_Direct3D = new D3DClass;
 
@@ -50,57 +51,16 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
 	{
 		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 		return false;
-	}
+	}*/
 
 	return true;
 }
 
-
-void ApplicationClass::Shutdown()
+void ApplicationClass::Frame()
 {
-	// Release the color shader object.
-	if (m_ColorShader)
-	{
-		m_ColorShader->Shutdown();
-		delete m_ColorShader;
-		m_ColorShader = 0;
-	}
-
-	// Release the model object.
-	if (m_Model)
-	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
-	}
-
-	// Release the camera object.
-	if (m_Camera)
-	{
-		delete m_Camera;
-		m_Camera = 0;
-	}
-
-	// Release the Direct3D object.
-	if (m_Direct3D)
-	{
-		m_Direct3D->Shutdown();
-		delete m_Direct3D;
-		m_Direct3D = nullptr;
-	}
-
-	if (m_System) {
-		delete m_System;
-		m_System = nullptr;
-	}
-
-	return;
-}
-
-
-bool ApplicationClass::Frame()
-{
-	bool result;
+	m_System->GFX().ClearBuffer(1.f, 0.f, 0.f);
+	m_System->GFX().EndFrame();
+	/*bool result;
 
 
 	// Render the graphics scene.
@@ -110,7 +70,7 @@ bool ApplicationClass::Frame()
 		return false;
 	}
 
-	return true;
+	return true;*/
 }
 
 
@@ -153,10 +113,21 @@ int ApplicationClass::Go()
 	while (true)
 	{
 		// process all messages pending, but to not block for new messages
-		if (const auto ecode = SystemClass::ProcessMessages())
+		if (const auto ecode = m_System->ProcessMessages())
 		{
 			// if return optional has value, means we're quitting so return exit code
 			return *ecode;
+		}
+
+		while (const auto e = m_System->kbd.ReadKey()) {
+			if (!e->IsPress())
+			{
+				continue;
+			}
+
+			if (e->GetCode() == VK_ESCAPE) {
+				PostQuitMessage(0);
+			}
 		}
 		Frame();
 	}
@@ -165,5 +136,40 @@ int ApplicationClass::Go()
 
 ApplicationClass::~ApplicationClass()
 {
+	// Release the color shader object.
+	if (m_ColorShader)
+	{
+		m_ColorShader->Shutdown();
+		delete m_ColorShader;
+		m_ColorShader = 0;
+	}
+
+	// Release the model object.
+	if (m_Model)
+	{
+		m_Model->Shutdown();
+		delete m_Model;
+		m_Model = 0;
+	}
+
+	// Release the camera object.
+	if (m_Camera)
+	{
+		delete m_Camera;
+		m_Camera = 0;
+	}
+
+	// Release the Direct3D object.
+	if (m_Direct3D)
+	{
+		m_Direct3D->Shutdown();
+		delete m_Direct3D;
+		m_Direct3D = nullptr;
+	}
+
+	if (m_System) {
+		delete m_System;
+		m_System = nullptr;
+	}
 }
 

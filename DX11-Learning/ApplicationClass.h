@@ -22,13 +22,10 @@ public:
 	
 	bool Initialize(int, int);
 	int Go();
-	void Shutdown();
-private:
-	bool Frame();
 
 private:
 	bool Render();
-
+	void Frame();
 private:
 	D3DClass* m_Direct3D;
 	CameraClass* m_Camera;

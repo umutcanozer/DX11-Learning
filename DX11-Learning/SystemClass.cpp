@@ -39,7 +39,10 @@ const char* SystemClass::WindowClass::GetName()
 
 SystemClass::WindowClass::~WindowClass()
 {
-	UnregisterClass(wndClassName, GetInstance());
+	if (wndClass.h_inst != nullptr) {
+		UnregisterClass(wndClassName, GetInstance());
+		wndClass.h_inst = nullptr; 
+	}
 }
 
 SystemClass::SystemClass(int screenWidth, int screenHeight, const char* name)
@@ -60,6 +63,8 @@ SystemClass::SystemClass(int screenWidth, int screenHeight, const char* name)
 
 	// Hide the mouse cursor.
 	ShowCursor(true);
+
+	p_Gfx = std::make_unique<Graphics>(m_hWnd);
 }
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam) 
@@ -176,13 +181,19 @@ LRESULT CALLBACK SystemClass::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, L
 	}
 }
 
+HWND SystemClass::GetHWND()
+{
+	return m_hWnd;
+}
+
+Graphics& SystemClass::GFX()
+{
+	return *p_Gfx;
+}
 
 SystemClass::~SystemClass()
 {
 	DestroyWindow(m_hWnd);
 }
 
-HWND SystemClass::GetHWND()
-{
-	return m_hWnd;
-}
+

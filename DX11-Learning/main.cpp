@@ -12,9 +12,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	if (app->Initialize(800, 600)) {
 		app->Go();
 	}
-	
-	// Shutdown and release the system object.
-	app->Shutdown();
 	delete app;
 	app = nullptr;
 
