@@ -13,7 +13,7 @@ public:
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b);
 
-	void DrawingTriangle();
+	void DrawingTriangle(float angle);
 private:
 	HRESULT hr;
 

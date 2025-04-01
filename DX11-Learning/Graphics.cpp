@@ -1,6 +1,9 @@
 #include "Graphics.h"
 #include <iostream>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
+
+namespace dx = DirectX;
 
 Graphics::Graphics(HWND hwnd)
 {
@@ -68,16 +71,31 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 	m_deviceContext->ClearRenderTargetView(m_renderTargetView.Get(), color);
 }
 
-void Graphics::DrawingTriangle()
+void Graphics::DrawingTriangle(float angle)
 {
+	//when creating a struct in C++ the data is stored in system memory, but we need it to be in video memory
 	struct Vertex {
-		float x;
-		float y;
+		struct position {
+			float x;
+			float y;
+		}pos;
+
+		struct color {
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+			unsigned char a;
+		}color;
+		
 	};
-	const Vertex vertices[] = {
-		{0.f, 0.75f},
-		{0.75f, -0.75f},
-		{-0.75f, -0.75f}
+	const Vertex vertices[] = 
+	{
+		{ 0.0f,0.5f,255,0,0,1 },
+		{ 0.5f,-0.5f,0,255,0,1 },
+		{ -0.5f,-0.5f,0,0,255,1 },
+		{ -0.3f,0.3f,0,255,0,1 },
+		{ 0.3f,0.3f,0,0,255,1 },
+		{ 0.0f,-1.f,255,0,0,1 },
 	};	
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> p_vertexBuffer;
@@ -107,6 +125,71 @@ void Graphics::DrawingTriangle()
 	offset = 0u;
 	m_deviceContext->IASetVertexBuffers(0u, 1u, p_vertexBuffer.GetAddressOf(), &stride, &offset);
 
+
+	const unsigned short indices[] =
+	{
+		0,1,2,
+		0,2,3,
+		0,4,1,
+		2,1,5,
+	};
+	
+	Microsoft::WRL::ComPtr<ID3D11Buffer> p_indexBuffer;
+	D3D11_BUFFER_DESC ibDesc;
+	ibDesc.Usage = D3D11_USAGE_DEFAULT;
+	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibDesc.CPUAccessFlags = 0;
+	ibDesc.MiscFlags = 0;
+	ibDesc.ByteWidth = sizeof(indices);
+	ibDesc.StructureByteStride = sizeof(unsigned short);
+
+	D3D11_SUBRESOURCE_DATA iData;
+	iData.pSysMem = indices;
+
+	hr= m_device->CreateBuffer(&ibDesc, &iData, &p_indexBuffer);
+	if (FAILED(hr))
+	{
+		std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
+		return;
+	}
+
+	//bind index buffer
+	m_deviceContext->IASetIndexBuffer(p_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+
+	//constant buffer
+	struct ConstantBuffer {
+		dx::XMMATRIX transform;
+	};
+
+	const ConstantBuffer cb = {
+		{
+			dx::XMMatrixTranspose(
+				dx::XMMatrixRotationZ(angle)*
+				dx::XMMatrixScaling(3.f / 4.f, 1.f, 1.f))
+		}
+	};
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> p_constantBuffer;
+	D3D11_BUFFER_DESC cbDesc;
+	D3D11_SUBRESOURCE_DATA cData;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC; //for update it every frame
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0u;
+	cbDesc.ByteWidth = sizeof(cb);
+	cbDesc.StructureByteStride = sizeof(ConstantBuffer);
+
+	cData.pSysMem = &cb;
+
+	hr = m_device->CreateBuffer(&cbDesc, &cData, &p_constantBuffer);
+	if (FAILED(hr)) {
+		std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
+		return;
+	}
+
+	m_deviceContext->VSSetConstantBuffers(0u, 1u, p_constantBuffer.GetAddressOf());
+
+	//pixel shader
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> p_pixelShader;
 	hr = D3DReadFileToBlob(L"PixelShader.cso", &p_blob);
 	if (FAILED(hr)) {
@@ -140,7 +223,8 @@ void Graphics::DrawingTriangle()
 	//input vertex layout
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> p_inputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 8u, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	hr = m_device->CreateInputLayout(
@@ -168,6 +252,6 @@ void Graphics::DrawingTriangle()
 	// Create the viewport.
 	m_deviceContext->RSSetViewports(1, &vp);
 	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_deviceContext->Draw((UINT)std::size(vertices), 0u);
+	m_deviceContext->DrawIndexed((UINT)std::size(indices), 0u, 0u);
 }
 

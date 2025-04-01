@@ -7,6 +7,7 @@ ApplicationClass::ApplicationClass()
 	m_Model = nullptr;
 	m_ColorShader = nullptr;
 	m_System = nullptr;
+	last = std::chrono::steady_clock::now();
 }
 
 
@@ -18,8 +19,11 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
 
 void ApplicationClass::Frame()
 {
-	m_System->GFX().ClearBuffer(1.f, 0.f, 0.f);
-	m_System->GFX().DrawingTriangle();
+	m_System->GFX().ClearBuffer(0.f, 0.f, 0.f);
+
+	float angle = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+
+	m_System->GFX().DrawingTriangle(angle);
 	m_System->GFX().EndFrame();
 }
 
