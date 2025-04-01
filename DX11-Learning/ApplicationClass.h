@@ -1,11 +1,8 @@
 #pragma once
 
 #include <chrono>
-#include "D3DClass.h"
 #include "SystemClass.h"
-#include "cameraclass.h"
-#include "modelclass.h"
-#include "colorshaderclass.h"
+
 
 
 const bool FULL_SCREEN = false;
@@ -25,13 +22,8 @@ public:
 	int Go();
 
 private:
-	bool Render();
 	void Frame();
 private:
-	D3DClass* m_Direct3D;
-	CameraClass* m_Camera;
-	ModelClass* m_Model;
-	ColorShaderClass* m_ColorShader;
 	SystemClass* m_System;
 
 	std::chrono::steady_clock::time_point last;
