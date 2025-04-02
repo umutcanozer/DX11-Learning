@@ -13,7 +13,7 @@ public:
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b);
 
-	void DrawingTriangle(float angle);
+	void DrawingTriangle(float angle, float x, float z);
 private:
 	HRESULT hr;
 
@@ -22,5 +22,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
 
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
 };
 

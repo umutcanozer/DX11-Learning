@@ -95,6 +95,20 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 				mouse.OnMouseEnter();
 			}
 		}
+		// not in client -> log move / maintain capture if button down
+		else
+		{
+			if (wparam & (MK_LBUTTON | MK_RBUTTON))
+			{
+				mouse.OnMouseMove(pt.x, pt.y);
+			}
+			// button up -> release capture / log event for leaving
+			else
+			{
+				ReleaseCapture();
+				mouse.OnMouseLeave();
+			}
+		}
 		break;
 	}
 	case WM_LBUTTONDOWN:

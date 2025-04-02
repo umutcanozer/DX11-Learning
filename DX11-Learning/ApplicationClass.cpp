@@ -19,7 +19,16 @@ void ApplicationClass::Frame()
 
 	float angle = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 
-	m_System->GFX().DrawingTriangle(angle);
+	m_System->GFX().DrawingTriangle(
+		angle,
+		m_System->mouse.GetPosX() / 400.0f - 1.0f,
+		-m_System->mouse.GetPosY() / 300.0f + 1.0f);
+
+	m_System->GFX().DrawingTriangle(
+		angle,
+		0.f,
+		0.f);
+
 	m_System->GFX().EndFrame();
 }
 
