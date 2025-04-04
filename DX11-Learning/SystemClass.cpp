@@ -47,8 +47,8 @@ SystemClass::WindowClass::~WindowClass()
 
 SystemClass::SystemClass(int screenWidth, int screenHeight, const char* name)
 	:
-	width(width),
-	height(height)
+	width(screenWidth),
+	height(screenHeight)
 {
 	int posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
 	int posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
@@ -64,41 +64,41 @@ SystemClass::SystemClass(int screenWidth, int screenHeight, const char* name)
 	// Hide the mouse cursor.
 	ShowCursor(true);
 
-	p_Gfx = std::make_unique<Graphics>(m_hWnd);
+	m_pGFX = std::make_unique<Graphics>(m_hWnd);
 }
 
-LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam) 
+LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
-	switch (umsg)
+	switch (uMsg)
 	{
 	case WM_KILLFOCUS:
 		kbd.ClearState();
 		break;
 	case WM_KEYDOWN:
-		kbd.OnKeyPressed(static_cast<unsigned char>(wparam));
+		kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
 		break;
 	case WM_KEYUP:
-		kbd.OnKeyReleased(static_cast<unsigned char>(wparam));
+		kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
-		kbd.OnChar(static_cast<unsigned char>(wparam));
+		kbd.OnChar(static_cast<unsigned char>(wParam));
 		break;
 	case WM_MOUSEMOVE:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
+		const POINTS pt = MAKEPOINTS(lParam);
 		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
 		{
 			mouse.OnMouseMove(pt.x, pt.y);
 			if (!mouse.IsInWindow())
 			{
-				SetCapture(hwnd);
+				SetCapture(hWnd);
 				mouse.OnMouseEnter();
 			}
 		}
 		// not in client -> log move / maintain capture if button down
 		else
 		{
-			if (wparam & (MK_LBUTTON | MK_RBUTTON))
+			if (wParam & (MK_LBUTTON | MK_RBUTTON))
 			{
 				mouse.OnMouseMove(pt.x, pt.y);
 			}
@@ -113,36 +113,36 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 	}
 	case WM_LBUTTONDOWN:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
+		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONDOWN:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
+		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
+		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
+		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_MOUSEWHEEL:
 	{
-		const POINTS pt = MAKEPOINTS(lparam);
-		if (GET_WHEEL_DELTA_WPARAM(wparam) > 0)
+		const POINTS pt = MAKEPOINTS(lParam);
+		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
 		{
 			mouse.OnWheelUp(pt.x, pt.y);
 		}
-		else if (GET_WHEEL_DELTA_WPARAM(wparam) < 0)
+		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
 		{
 			mouse.OnWheelDown(pt.x, pt.y);
 		}
@@ -150,7 +150,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 	}
 	// Any other messages send to the default message handler as our application won't make use of them.
 	default:
-		return DefWindowProc(hwnd, umsg, wparam, lparam);
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 }
 
@@ -177,22 +177,31 @@ std::optional<int> SystemClass::ProcessMessages()
 	return {};
 }
 
-LRESULT CALLBACK SystemClass::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK SystemClass::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	
-	SystemClass* pThis = reinterpret_cast<SystemClass*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-	switch (umessage)
+	SystemClass* pThis = reinterpret_cast<SystemClass*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	switch (uMsg)
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	case WM_CLOSE:
-		PostQuitMessage(0);
+		HMENU hMenu;
+		hMenu = GetMenu(hWnd);
+		if (hMenu != NULL)
+		{
+			DestroyMenu(hMenu);
+		}
+		DestroyWindow(hWnd);
+		UnregisterClass(
+			WindowClass::GetName(), WindowClass::GetInstance() // Unregister the window class.
+		);
 		return 0;
 	
 	// All other messages pass to the message handler in the system class.
 	default:
-		return pThis->MessageHandler(hwnd, umessage, wparam, lparam);
+		return pThis->MessageHandler(hWnd, uMsg, wParam, lParam);
 	}
 }
 
@@ -203,7 +212,7 @@ HWND SystemClass::GetHWND()
 
 Graphics& SystemClass::GFX()
 {
-	return *p_Gfx;
+	return *m_pGFX;
 }
 
 SystemClass::~SystemClass()

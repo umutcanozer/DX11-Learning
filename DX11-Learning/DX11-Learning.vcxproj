@@ -141,10 +141,17 @@
   <ItemGroup>
     <ClInclude Include="ApplicationClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="ShaderComponent.h" />
     <ClInclude Include="SystemClass.h" />
+    <ClInclude Include="Topology.h" />
+    <ClInclude Include="TransformComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11-Learning.rc" />
@@ -155,11 +162,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApplicationClass.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="ShaderComponent.cpp" />
     <ClCompile Include="SystemClass.cpp" />
+    <ClCompile Include="Topology.cpp" />
+    <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">

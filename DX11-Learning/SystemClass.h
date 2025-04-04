@@ -48,5 +48,5 @@ private:
 	HWND m_hWnd;
 	int width;
 	int height;
-	std::unique_ptr<Graphics> p_Gfx;
+	std::unique_ptr<Graphics> m_pGFX;
 };

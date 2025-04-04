@@ -5,11 +5,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	ApplicationClass* app;
 
 	// Create the system object.
-	app = new ApplicationClass();
+	app = new ApplicationClass(800, 600);
 
-	if (app->Initialize(800, 600)) {
-		app->Go();
-	}
+	
+	app->Go();
+	
 	delete app;
 	app = nullptr;
 

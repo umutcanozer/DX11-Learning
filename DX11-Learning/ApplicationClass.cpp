@@ -1,35 +1,106 @@
 #include "ApplicationClass.h"
+#include "MeshComponent.h"
+#include "ShaderComponent.h"
+#include "ConstantBuffer.h"
+#include "Topology.h"
+#include <memory>
 
-ApplicationClass::ApplicationClass()
-{
-	m_System = nullptr;
-	last = std::chrono::steady_clock::now();
-}
-
-
-bool ApplicationClass::Initialize(int screenWidth, int screenHeight)
+ApplicationClass::ApplicationClass(int screenWidth, int screenHeight)
 {
 	m_System = new SystemClass(screenWidth, screenHeight, "Engine");
-	return true;
+	m_lastTime = std::chrono::high_resolution_clock::now();
+
+	struct Vertex {
+		struct position {
+			float x;
+			float y;
+			float z;
+		}pos;
+	};
+	const std::vector<Vertex> vertices =
+	{
+		{-1.f,-1.f,-1.f},
+		{1.f,-1.f,-1.f},
+		{-1.f,1.f,-1.f},
+		{1.f,1.f,-1.f},
+		{-1.f,-1.f,1.f},
+		{1.f,-1.f,1.f},
+		{-1.f,1.f,1.f},
+		{1.f,1.f,1.f},
+	};
+	const std::vector<unsigned short> indices =
+	{
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
+	};
+
+	struct ConstantBuffer
+	{
+		struct
+		{
+			float r;
+			float g;
+			float b;
+			float a;
+		} face_colors[6];
+	};
+	const ConstantBuffer cb2 =
+	{
+		{
+			{ 1.0f,0.0f,1.0f },
+			{ 1.0f,0.0f,0.0f },
+			{ 0.0f,1.0f,0.0f },
+			{ 0.0f,0.0f,1.0f },
+			{ 1.0f,1.0f,0.0f },
+			{ 0.0f,1.0f,1.0f },
+		}
+	};
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
+	{
+		{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
+	};
+	ShaderData shaderData = { m_System->GFX(), L"VertexShader.cso", L"PixelShader.cso", ied };
+
+	std::shared_ptr<Component> cubeSharedMesh = std::make_shared<MeshComponent>(m_System->GFX(), vertices, indices);
+	std::shared_ptr<Component> cubeSharedShader = std::make_shared<ShaderComponent>(shaderData);
+	std::shared_ptr<Component> cubeSharedTopology = std::make_shared<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	std::shared_ptr<Component> cubeSharedPConstantBuffer = std::make_shared<PixelConstantBuffer<ConstantBuffer>>(m_System->GFX(), cb2);
+	
+
+
+	cube.AddComponent(cubeSharedTopology);
+	cube.AddComponent(cubeSharedMesh);
+	cube.AddComponent(cubeSharedShader);
+	cube.AddComponent(cubeSharedPConstantBuffer);
+
+	cube.Bind(m_System->GFX());
 }
 
 void ApplicationClass::Frame()
 {
-	m_System->GFX().ClearBuffer(0.f, 0.f, 0.f);
+	auto deltaTime = GetDeltaTime();
+	m_System->GFX().ClearBuffer();
 
-	float angle = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+	cube.GetComponent<MeshComponent>()->Draw(m_System->GFX());
+	cube.Update(deltaTime, m_System->GFX());
 
-	m_System->GFX().DrawingTriangle(
-		angle,
-		m_System->mouse.GetPosX() / 400.0f - 1.0f,
-		-m_System->mouse.GetPosY() / 300.0f + 1.0f);
+	m_System->GFX().Present();
+}
 
-	m_System->GFX().DrawingTriangle(
-		angle,
-		0.f,
-		0.f);
+float ApplicationClass::GetDeltaTime()
+{
+	auto currentTime = std::chrono::high_resolution_clock::now();
 
-	m_System->GFX().EndFrame();
+	std::chrono::duration<float> delta = currentTime - m_lastTime;
+
+	m_lastTime = currentTime;
+
+	return delta.count();
 }
 
 
@@ -57,7 +128,6 @@ int ApplicationClass::Go()
 		Frame();
 	}
 }
-
 
 ApplicationClass::~ApplicationClass()
 {
