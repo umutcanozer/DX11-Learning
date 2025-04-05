@@ -78,6 +78,7 @@ ApplicationClass::ApplicationClass(int screenWidth, int screenHeight)
 	cube.AddComponent(cubeSharedShader);
 	cube.AddComponent(cubeSharedPConstantBuffer);
 
+	
 	cube.Bind(m_System->GFX());
 }
 
@@ -88,7 +89,6 @@ void ApplicationClass::Frame()
 
 	cube.GetComponent<MeshComponent>()->Draw(m_System->GFX());
 	cube.Update(deltaTime, m_System->GFX());
-
 	m_System->GFX().Present();
 }
 

@@ -8,7 +8,7 @@ public:
 	MeshComponent(Graphics& gfx,
 	const std::vector<V>& vertices,
 	const std::vector<unsigned short> indices) :
-	stride(sizeof(V))
+	stride(sizeof(V)), offset(0)
 	{
 		vertexCount = static_cast<unsigned int>(vertices.size());
 		indexCount = static_cast<unsigned int>(indices.size());

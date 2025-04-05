@@ -35,7 +35,7 @@ Graphics::Graphics(HWND hwnd)
 		nullptr, //default
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		0,
+		deviceFlags,
 		&feature_level,
 		1,
 		D3D11_SDK_VERSION,
@@ -52,7 +52,7 @@ Graphics::Graphics(HWND hwnd)
 		return;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Resource> p_backBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> p_backBuffer;
 	//0 = backbuffer
 	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &p_backBuffer);
 	hr = m_pDevice->CreateRenderTargetView(p_backBuffer.Get(), nullptr, &m_pRenderTargetView);
@@ -61,6 +61,8 @@ Graphics::Graphics(HWND hwnd)
 		std::cerr << "CreateRenderTargetView failed with error: " << hr << std::endl;
 		return;
 	}
+	D3D11_TEXTURE2D_DESC backBufferDesc = {};
+	p_backBuffer->GetDesc(&backBufferDesc);
 
 	//depth stencil
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -80,8 +82,8 @@ Graphics::Graphics(HWND hwnd)
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> p_depthStencil;
 	D3D11_TEXTURE2D_DESC dDesc = {};
 	//must match with the swap chain values
-	dDesc.Width = 800u;
-	dDesc.Height = 600u;
+	dDesc.Width = backBufferDesc.Width;
+	dDesc.Height = backBufferDesc.Height;
 	dDesc.MipLevels = 1u;
 	dDesc.ArraySize = 1u;
 	dDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -142,6 +144,8 @@ void Graphics::Present()
 
 void Graphics::ClearBuffer() 
 {
+	m_pDeviceContext->OMSetRenderTargets(1u, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+
 	const float teal[] = { 0.098f, 0.439f, 0.439f, 1.000f };
 	m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView.Get(), teal);
 	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
