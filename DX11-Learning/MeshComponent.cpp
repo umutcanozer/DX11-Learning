@@ -8,5 +8,5 @@ void MeshComponent::Bind(Graphics& gfx)
 
 void MeshComponent::Draw(Graphics& gfx)
 {
-	GetContext(gfx)->DrawIndexed(indexCount, 0u, 0u);
+	gfx.DrawIndexed(indexCount);
 }

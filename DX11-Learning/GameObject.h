@@ -30,6 +30,6 @@ public:
 	void Bind(Graphics& gfx);
 private:
     std::vector<std::shared_ptr<Component>> m_sharedComponents;
-	std::unique_ptr<Component> m_vertexConstant;
+    std::unique_ptr<Component> m_sharedVConstantBuffer;
 };
 

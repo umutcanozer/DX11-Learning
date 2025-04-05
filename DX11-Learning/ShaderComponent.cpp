@@ -3,7 +3,7 @@
 ShaderComponent::ShaderComponent(ShaderData args)
 {
 	HRESULT hr;
-#pragma region vertex sahder
+#pragma region vertex shader
 	hr = D3DReadFileToBlob(args.vsPath.c_str(), &m_pVBlob);
 	if (FAILED(hr))
 	{

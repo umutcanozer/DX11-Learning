@@ -68,8 +68,8 @@ ApplicationClass::ApplicationClass(int screenWidth, int screenHeight)
 
 	std::shared_ptr<Component> cubeSharedMesh = std::make_shared<MeshComponent>(m_System->GFX(), vertices, indices);
 	std::shared_ptr<Component> cubeSharedShader = std::make_shared<ShaderComponent>(shaderData);
-	std::shared_ptr<Component> cubeSharedTopology = std::make_shared<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	std::shared_ptr<Component> cubeSharedPConstantBuffer = std::make_shared<PixelConstantBuffer<ConstantBuffer>>(m_System->GFX(), cb2);
+	std::shared_ptr<Component> cubeSharedTopology = std::make_shared<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 
 

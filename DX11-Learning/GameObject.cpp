@@ -23,7 +23,8 @@ void GameObject::Update(float deltaTime, Graphics& gfx)
             )
         }
     };
-    std::unique_ptr<Component> cubeSharedVConstantBuffer = std::make_unique<VertexConstantBuffer<ConstantBuffer>>(gfx, cb);
+    m_sharedVConstantBuffer = std::make_unique<VertexConstantBuffer<ConstantBuffer>>(gfx, cb);
+	m_sharedVConstantBuffer->Bind(gfx);
 }
 
 void GameObject::Bind(Graphics& gfx)
