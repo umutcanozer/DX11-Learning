@@ -4,16 +4,12 @@
 
 GameObject::GameObject()
 {
-
 }
+
 
 void GameObject::Update(float deltaTime, Graphics& gfx)
 {
-    struct ConstantBuffer {
-        DirectX::XMMATRIX transform;
-    };
-
-    const ConstantBuffer cb = {
+   const ConstantBuffer cb = {
         {
             DirectX::XMMatrixTranspose(
                 DirectX::XMMatrixRotationZ(deltaTime) *
@@ -23,7 +19,7 @@ void GameObject::Update(float deltaTime, Graphics& gfx)
             )
         }
     };
-    m_sharedVConstantBuffer = std::make_unique<VertexConstantBuffer<ConstantBuffer>>(gfx, cb);
+    m_sharedVConstantBuffer = std::make_unique<VertexConstantBuffer<ConstantBuffer>>(gfx);
 	m_sharedVConstantBuffer->Bind(gfx);
 }
 

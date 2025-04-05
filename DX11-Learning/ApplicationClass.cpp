@@ -51,11 +51,11 @@ ApplicationClass::ApplicationClass(int screenWidth, int screenHeight)
 	const ConstantBuffer cb2 =
 	{
 		{
-			{ 1.0f,0.0f,1.0f },
-			{ 1.0f,0.0f,0.0f },
+			{ 0.0f,1.0f,0.0f },
+			{ 0.0f,1.0f,0.0f },
 			{ 0.0f,1.0f,0.0f },
 			{ 0.0f,0.0f,1.0f },
-			{ 1.0f,1.0f,0.0f },
+			{ 0.0f,1.0f,1.0f },
 			{ 0.0f,1.0f,1.0f },
 		}
 	};
@@ -73,10 +73,10 @@ ApplicationClass::ApplicationClass(int screenWidth, int screenHeight)
 	
 
 
-	cube.AddComponent(cubeSharedTopology);
 	cube.AddComponent(cubeSharedMesh);
 	cube.AddComponent(cubeSharedShader);
 	cube.AddComponent(cubeSharedPConstantBuffer);
+	cube.AddComponent(cubeSharedTopology);
 
 	
 	cube.Bind(m_System->GFX());

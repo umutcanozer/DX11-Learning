@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics.h"
 #include <iostream>
+
 class Component {
 public:
 	virtual ~Component() = default;

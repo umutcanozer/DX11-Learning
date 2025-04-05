@@ -29,7 +29,13 @@ public:
     void Update(float deltaTime, Graphics& gfx);
 	void Bind(Graphics& gfx);
 private:
+
+    struct ConstantBuffer {
+        DirectX::XMMATRIX transform;
+    };
+
+    std::unique_ptr<VertexConstantBuffer<ConstantBuffer>> m_sharedVConstantBuffer;
     std::vector<std::shared_ptr<Component>> m_sharedComponents;
-    std::unique_ptr<Component> m_sharedVConstantBuffer;
+    //std::unique_ptr<Component> m_sharedVConstantBuffer;
 };
 

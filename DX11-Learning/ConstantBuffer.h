@@ -5,6 +5,18 @@ template<typename C>
 class ConstantBuffer : public Component
 {
 public:
+	void UpdateBuffer(Graphics& gfx, const C& consts)
+	{
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		GetContext(gfx)->Map(
+			m_pConstantBuffer.Get(), 0u,
+			D3D11_MAP_WRITE_DISCARD, 0u,
+			&msr
+		);
+		memcpy(msr.pData, &consts, sizeof(consts));
+		GetContext(gfx)->Unmap(m_pConstantBuffer.Get(), 0u);
+	}
 	ConstantBuffer(Graphics& gfx, const C& consts) {
 		D3D11_BUFFER_DESC cbDesc = {};
 		D3D11_SUBRESOURCE_DATA cData = {};
@@ -17,6 +29,20 @@ public:
 
 		cData.pSysMem = &consts;
 		HRESULT hr = GetDevice(gfx)->CreateBuffer(&cbDesc, &cData, &m_pConstantBuffer);
+		if (FAILED(hr)) {
+			std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
+			return;
+		}
+	}ConstantBuffer(Graphics& gfx)
+	{
+		D3D11_BUFFER_DESC cbd;
+		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbd.Usage = D3D11_USAGE_DYNAMIC;
+		cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cbd.MiscFlags = 0u;
+		cbd.ByteWidth = sizeof(C);
+		cbd.StructureByteStride = 0u;
+		HRESULT hr = GetDevice(gfx)->CreateBuffer(&cbd, nullptr, &m_pConstantBuffer);
 		if (FAILED(hr)) {
 			std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
 			return;
