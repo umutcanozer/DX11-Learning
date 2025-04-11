@@ -5,12 +5,14 @@
 
 namespace dx = DirectX;
 
-Graphics::Graphics(HWND hwnd)
+Graphics::Graphics(HWND hWnd)
 {
 	D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
 	DXGI_SWAP_CHAIN_DESC scd = {};
-	scd.BufferDesc.Width = 0;
-	scd.BufferDesc.Height = 0;
+
+	ZeroMemory(&scd, sizeof(scd));
+	scd.BufferDesc.Width = 800;  
+	scd.BufferDesc.Height = 600;
 	scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	scd.BufferDesc.RefreshRate.Numerator = 0;
 	scd.BufferDesc.RefreshRate.Denominator = 0;
@@ -20,7 +22,7 @@ Graphics::Graphics(HWND hwnd)
 	scd.SampleDesc.Quality = 0;
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	scd.BufferCount = 2;
-	scd.OutputWindow = hwnd;
+	scd.OutputWindow = hWnd;
 	scd.Windowed = TRUE;
 	scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	scd.Flags = 0;
@@ -54,7 +56,7 @@ Graphics::Graphics(HWND hwnd)
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> p_backBuffer;
 	//0 = backbuffer
-	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &p_backBuffer);
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &p_backBuffer);
 	hr = m_pDevice->CreateRenderTargetView(p_backBuffer.Get(), nullptr, &m_pRenderTargetView);
 	if (FAILED(hr))
 	{
@@ -154,14 +156,4 @@ void Graphics::ClearBuffer()
 void Graphics::DrawIndexed(UINT count)
 {
 	m_pDeviceContext->DrawIndexed(count, 0u, 0u);
-}
-
-void Graphics::SetProjection(DirectX::FXMMATRIX proj)
-{
-	projection = proj;
-}
-
-DirectX::XMMATRIX Graphics::GetProjection() const
-{
-	return projection;
 }

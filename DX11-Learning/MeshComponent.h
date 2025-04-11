@@ -25,7 +25,7 @@ public:
 		vbDesc.StructureByteStride = sizeof(V);
 
 		vData.pSysMem = vertices.data();
-		hr = GetDevice(gfx)->CreateBuffer(&vbDesc, &vData, &m_pVertexBuffer);
+		hr = gfx.GetDevice()->CreateBuffer(&vbDesc, &vData, &m_pVertexBuffer);
 		if (FAILED(hr))
 		{
 			std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
@@ -44,7 +44,7 @@ public:
 		ibDesc.StructureByteStride = sizeof(unsigned short);
 
 		iData.pSysMem = indices.data();
-		hr = GetDevice(gfx)->CreateBuffer(&ibDesc, &iData, &m_pIndexBuffer);
+		hr = gfx.GetDevice()->CreateBuffer(&ibDesc, &iData, &m_pIndexBuffer);
 		if (FAILED(hr))
 		{
 			std::cerr << "CreateBuffer failed with error: " << hr << std::endl;
@@ -68,7 +68,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_pVertexBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_pIndexBuffer;
-
-	D3D11_PRIMITIVE_TOPOLOGY type;
 };
 

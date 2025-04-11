@@ -9,7 +9,6 @@
 
 class Graphics
 {
-	friend class Component;
 public:
 	Graphics(HWND hwnd);
 	Graphics(const Graphics&) = delete;
@@ -20,13 +19,12 @@ public:
 	void ClearBuffer();
 
 	void DrawIndexed(UINT count);
-	void SetProjection(DirectX::FXMMATRIX proj);
-	DirectX::XMMATRIX GetProjection() const;
+
+	ID3D11Device* GetDevice() const { return m_pDevice.Get(); }
+	ID3D11DeviceContext* GetDeviceContext() const { return m_pDeviceContext.Get(); }
 
 private:
 	HRESULT hr;
-	DirectX::XMMATRIX projection;
-
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pDeviceContext;

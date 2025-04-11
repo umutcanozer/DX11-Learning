@@ -23,4 +23,5 @@ private:
 
     Microsoft::WRL::ComPtr<ID3DBlob> m_pVBlob;
     Microsoft::WRL::ComPtr<ID3DBlob> m_pPBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> m_pErrorBlob;
 };

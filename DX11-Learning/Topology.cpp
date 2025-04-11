@@ -7,6 +7,6 @@ Topology::Topology(D3D11_PRIMITIVE_TOPOLOGY topology) :
 
 void Topology::Bind(Graphics& gfx)
 {
-	GetContext(gfx)->IASetPrimitiveTopology(m_topology);
+	gfx.GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 }
 

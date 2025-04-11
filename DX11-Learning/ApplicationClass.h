@@ -22,9 +22,22 @@ private:
 	void Frame();
 	float GetDeltaTime();
 private:
+	HRESULT hr;
 	SystemClass* m_System;
 
 	std::chrono::steady_clock::time_point m_lastTime;
 	GameObject cube;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_pConstantBuffer;
+
+	struct MatrixBufferType {
+		DirectX::XMFLOAT4X4 world;
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 proj;
+	};
+
+	DirectX::XMMATRIX viewMat;
+	DirectX::XMMATRIX projMat;
+	float rotationAngle;
 };
 

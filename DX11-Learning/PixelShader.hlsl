@@ -1,8 +1,8 @@
-cbuffer CBuffer{
-	float4 face_colors[6];
+struct PSInput {
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
 };
 
-float4 main(uint tid : SV_PrimitiveID) : SV_TARGET
-{
-	return face_colors[tid/2];
+float4 main(PSInput input) : SV_TARGET{
+    return input.color;
 }

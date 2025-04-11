@@ -7,11 +7,12 @@ ShaderComponent::ShaderComponent(ShaderData args)
 	hr = D3DReadFileToBlob(args.vsPath.c_str(), &m_pVBlob);
 	if (FAILED(hr))
 	{
-		std::cerr << "D3DReadFileToBlob failed with error: " << hr << "\n";
+		std::wcerr << L"Failed to load compiled shader: " << args.vsPath << L"\n";
+		std::wcerr << L"HRESULT = 0x" << std::hex << hr << "\n";
 		return;
 	}
 
-	hr = GetDevice(args.gfx)->CreateVertexShader(
+	hr = args.gfx.GetDevice()->CreateVertexShader(
 		m_pVBlob->GetBufferPointer(), 
 		m_pVBlob->GetBufferSize(), 
 		nullptr, 
@@ -27,10 +28,11 @@ ShaderComponent::ShaderComponent(ShaderData args)
 	hr = D3DReadFileToBlob(args.psPath.c_str(), &m_pPBlob);
 	if (FAILED(hr))
 	{
-		std::cerr << "D3DReadFileToBlob failed with error: " << hr << "\n";
+		std::wcerr << L"Failed to load compiled pixel shader: " << args.psPath << L"\n";
+		std::wcerr << L"HRESULT = 0x" << std::hex << hr << "\n";
 		return;
 	}
-	hr = GetDevice(args.gfx)->CreatePixelShader(
+	hr = args.gfx.GetDevice()->CreatePixelShader(
 		m_pPBlob->GetBufferPointer(),
 		m_pPBlob->GetBufferSize(), 
 		nullptr, 
@@ -42,7 +44,7 @@ ShaderComponent::ShaderComponent(ShaderData args)
 #pragma endregion
 
 #pragma region input layout
-	hr = GetDevice(args.gfx)->CreateInputLayout(
+	hr = args.gfx.GetDevice()->CreateInputLayout(
 		args.layout.data(), (UINT)args.layout.size(),
 		m_pVBlob->GetBufferPointer(),
 		m_pVBlob->GetBufferSize(),
@@ -58,7 +60,7 @@ ShaderComponent::ShaderComponent(ShaderData args)
 
 void ShaderComponent::Bind(Graphics& gfx)
 {
-	GetContext(gfx)->IASetInputLayout(m_pInputLayout.Get());
-	GetContext(gfx)->PSSetShader(m_pPixelShader.Get(), nullptr, 0u);
-	GetContext(gfx)->VSSetShader(m_pVertexShader.Get(), nullptr, 0u);
+	gfx.GetDeviceContext()->IASetInputLayout(m_pInputLayout.Get());
+	gfx.GetDeviceContext()->VSSetShader(m_pVertexShader.Get(), nullptr, 0u);
+	gfx.GetDeviceContext()->PSSetShader(m_pPixelShader.Get(), nullptr, 0u);
 }
